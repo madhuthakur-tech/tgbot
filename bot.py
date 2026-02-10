@@ -22,75 +22,100 @@ CHANNELS = {
 user_requests = {}
 video_sent = set()
 
-# ========== START ==========
+# STEP 1
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")]
-    ]
+    kb = [[InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="step2")]]
     await update.message.reply_text(
-        "😈 *Kya tumhe meri exclusive video chahiye?*",
-        reply_markup=InlineKeyboardMarkup(keyboard),
+        "😈 *Exclusive video unlock karni hai?*",
+        reply_markup=InlineKeyboardMarkup(kb),
         parse_mode="Markdown"
     )
 
-# ========== WANT VIDEO ==========
-async def want_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
+# STEP 2 – JOIN CHANNELS
+async def step2(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    q = update.callback_query
+    await q.answer()
 
-    buttons = []
-    for link in CHANNELS.values():
-        buttons.append([InlineKeyboardButton("📢 Join Channel", url=link)])
+    buttons = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNELS.values()]
+    buttons.append([InlineKeyboardButton("✅ Check Status", callback_data="step3")])
 
-    buttons.append([InlineKeyboardButton("✅ Check Status", callback_data="check_status")])
-
-    await query.message.reply_text(
-        "🔥 *Steps follow karo:*\n\n"
-        "1️⃣ Sabhi channels me join request bhejo\n"
-        "2️⃣ Phir yaha aakar *Check Status* dabao",
+    await q.message.reply_text(
+        "📌 *STEP 2*\n\n"
+        "👇 Sabhi channels me join request bhejo\n"
+        "Uske baad *Check Status* dabao",
         reply_markup=InlineKeyboardMarkup(buttons),
         parse_mode="Markdown"
     )
 
-# ========== JOIN REQUEST TRACK ==========
+# TRACK JOIN REQUESTS
 async def join_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    req = update.chat_join_request
-    user_id = req.from_user.id
-    channel_id = req.chat.id
+    uid = update.chat_join_request.from_user.id
+    cid = update.chat_join_request.chat.id
+    if cid in CHANNELS:
+        user_requests.setdefault(uid, set()).add(cid)
 
-    if channel_id in CHANNELS:
-        user_requests.setdefault(user_id, set()).add(channel_id)
+# STEP 3 – ERROR + RETRY
+async def step3(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    q = update.callback_query
+    await q.answer()
 
-# ========== CHECK STATUS ==========
-async def check_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
+    kb = [[InlineKeyboardButton("🔁 Dobara Request Bhejo", callback_data="step4")]]
 
-    user_id = query.from_user.id
-    joined = user_requests.get(user_id, set())
+    await q.message.reply_text(
+        "❌ *ERROR AAYA*\n\n"
+        "⚠️ Lagta hai sab channels me request nahi gayi\n"
+        "🔁 Firse sab channels me join request bhejo",
+        reply_markup=InlineKeyboardMarkup(kb),
+        parse_mode="Markdown"
+    )
+
+# STEP 4 – CONFIRM
+async def step4(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    q = update.callback_query
+    await q.answer()
+
+    kb = [[InlineKeyboardButton("✅ Haan, Ab Bhej Di", callback_data="step5")]]
+
+    await q.message.reply_text(
+        "📌 *CONFIRMATION*\n\n"
+        "Agar tumne ab *sab channels* me request bhej di hai\n"
+        "to niche confirm karo 👇",
+        reply_markup=InlineKeyboardMarkup(kb),
+        parse_mode="Markdown"
+    )
+
+# STEP 5 – FINAL CHECK
+async def step5(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    q = update.callback_query
+    await q.answer()
+
+    uid = q.from_user.id
+    joined = user_requests.get(uid, set())
 
     if joined == set(CHANNELS.keys()):
-        if user_id not in video_sent:
-            await query.message.reply_video(
+        if uid not in video_sent:
+            await q.message.reply_video(
                 video=VIDEO_FILE_ID,
-                caption="✅ *Sabhi channels me request bhej di gayi hai*\n🔥 Ye rahi tumhari exclusive video",
+                caption="✅ *ACCESS GRANTED*\n🔥 Ye rahi tumhari exclusive video",
                 parse_mode="Markdown"
             )
-            video_sent.add(user_id)
-        else:
-            await query.message.reply_text("🎥 Video already bhej di gayi hai.")
+            video_sent.add(uid)
     else:
-        await query.message.reply_text(
-            "⚠️ Abhi sabhi channels me request nahi bheji.\n\n👉 Pehle sab channels join karo."
+        await q.message.reply_text(
+            "❌ *Abhi bhi pending hai*\n\n"
+            "👉 Sabhi channels me request nahi gayi.\n"
+            "🔁 Firse request bhejo aur phir check karo."
         )
 
-# ========== MAIN ==========
+# MAIN
 def main():
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(want_video, pattern="want_video"))
-    app.add_handler(CallbackQueryHandler(check_status, pattern="check_status"))
+    app.add_handler(CallbackQueryHandler(step2, pattern="step2"))
+    app.add_handler(CallbackQueryHandler(step3, pattern="step3"))
+    app.add_handler(CallbackQueryHandler(step4, pattern="step4"))
+    app.add_handler(CallbackQueryHandler(step5, pattern="step5"))
     app.add_handler(ChatJoinRequestHandler(join_request))
 
     print("Bot running...")
@@ -98,5 +123,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
