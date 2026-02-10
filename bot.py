@@ -15,8 +15,8 @@ from telegram.ext import (
 TOKEN = os.getenv("BOT_TOKEN")
 
 VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
-
-START_PHOTO = "AgACAgUAAxkBAAMDaYr-66ojnCvF701cJ1NknwABL6uaAAIgD2sbaa5ZVBdxyTFJYbB0AQADAgADeQADOgQ"  # apni photo link daalna
+PHOTO_URL = "https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg"
+  # apni photo link daalna
 
 CHANNELS = {
     -1003708594569: "https://t.me/+xiDyyJTIWccxYzll",
