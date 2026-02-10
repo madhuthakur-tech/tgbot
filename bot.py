@@ -42,8 +42,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "😈 Kya tumhe meri exclusive video chahiye?",
         reply_markup=InlineKeyboardMarkup(keyboard)
-    )
-"
+    
     )
 
 # ============== BUTTON CLICK ==============
