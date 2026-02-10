@@ -12,10 +12,10 @@ from telegram.ext import (
     ContextTypes,
 )
 
+# ================= CONFIG =================
 TOKEN = os.getenv("BOT_TOKEN")
 
 VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
-
 
 CHANNELS = {
     -1003708594569: "https://t.me/+xiDyyJTIWccxYzll",
@@ -24,26 +24,19 @@ CHANNELS = {
     -1003737422554: "https://t.me/+_YmoMrDZ0oliMTll",
 }
 
-# user_id -> set(channel_ids)
-user_requests = {}
+user_requests = {}   # user_id -> set(channel_ids)
 video_sent = set()
 
 # ================= START =================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[
-        InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")
-    ]]
-    await update.message.reply_photo(
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")
+        [InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")]
     ]
-    )
 
     await update.message.reply_text(
-        "😈 Kya tumhe meri exclusive video chahiye?",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    
+        "😈 *Kya tumhe meri exclusive video chahiye?*",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown"
     )
 
 # ============== BUTTON CLICK ==============
@@ -51,9 +44,10 @@ async def want_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    buttons = []
-    for link in CHANNELS.values():
-        buttons.append([InlineKeyboardButton("📢 Join Channel", url=link)])
+    buttons = [
+        [InlineKeyboardButton("📢 Join Channel", url=link)]
+        for link in CHANNELS.values()
+    ]
 
     await query.message.reply_text(
         "🔥 *Meri video paane ke liye*\n\n"
@@ -75,10 +69,10 @@ async def join_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # approve request
     await context.bot.approve_chat_join_request(channel_id, user_id)
 
-    # track user
+    # track joined channels
     user_requests.setdefault(user_id, set()).add(channel_id)
 
-    # check all channels done
+    # check if all channels joined
     if user_requests[user_id] == set(CHANNELS.keys()):
         if user_id not in video_sent:
             await context.bot.send_video(
@@ -107,4 +101,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
