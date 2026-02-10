@@ -38,6 +38,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")
     ]
+    )
 
     await update.message.reply_text(
         "😈 Kya tumhe meri exclusive video chahiye?",
