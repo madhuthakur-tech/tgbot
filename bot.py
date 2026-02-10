@@ -19,10 +19,10 @@ VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUY
 
 # channel_id : invite_link
 CHANNELS = {
-    -1003708594569: "https://t.me/+xiDyyJTIWccxYzll",
-    -1003797237946: "https://t.me/+K3jud7ThW4Q4NDQ1",
-    -1003585811000: "https://t.me/+-s8gGlM-BcY1NDll",
-    -1003737422554: "https://t.me/+_YmoMrDZ0oliMTll",
+    -1003708594569: "https://t.me/+_YmoMrDZ0oliMTll",
+    -1003797237946: "https://t.me/+-s8gGlM-BcY1NDll",
+    -1003585811000: "https://t.me/+az-lgmrUAnU1MzQ1",
+    -1003737422554: "https://t.me/+Ltw6NlDYtaQ5OWE1",
 }
 
 # ================= MEMORY =================
