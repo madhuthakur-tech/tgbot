@@ -16,13 +16,13 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
 
-START_PHOTO = "https://i.imgur.com/xxxxxxx.jpg"  # apni photo link daalna
+START_PHOTO = "AgACAgUAAxkBAAMDaYr-66ojnCvF701cJ1NknwABL6uaAAIgD2sbaa5ZVBdxyTFJYbB0AQADAgADeQADOgQ"  # apni photo link daalna
 
 CHANNELS = {
-    -1003708594569: "https://t.me/+link1",
-    -1003797237946: "https://t.me/+link2",
-    -1003585811000: "https://t.me/+link3",
-    -1003737422554: "https://t.me/+link4",
+    -1003708594569: "https://t.me/+xiDyyJTIWccxYzll",
+    -1003797237946: "https://t.me/+K3jud7ThW4Q4NDQ1",
+    -1003585811000: "https://t.me/+-s8gGlM-BcY1NDll",
+    -1003737422554: "https://t.me/+_YmoMrDZ0oliMTll",
 }
 
 # user_id -> set(channel_ids)
