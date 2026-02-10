@@ -16,16 +16,16 @@ CHANNELS = {
 
 # ============ START ============
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want")]
-    ]
+    keyboard = [[
+        InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want")
+    ]]
     await update.message.reply_text(
         "😈 *Exclusive video chahiye?*",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown"
     )
 
-# ============ WANT VIDEO ============
+# ============ WANT ============
 async def want(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -48,47 +48,43 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
 
-    try:
-        member_ok = []
-        for cid in CHANNELS:
-            member = await context.bot.get_chat_member(cid, q.from_user.id)
-            if member.status in ("member", "administrator", "creator"):
-                member_ok.append(cid)
+    joined = 0
+    for cid in CHANNELS:
+        try:
+            m = await context.bot.get_chat_member(cid, q.from_user.id)
+            if m.status in ("member", "administrator", "creator"):
+                joined += 1
+        except:
+            pass
 
-        if len(member_ok) == len(CHANNELS):
-            keyboard = [
-                [InlineKeyboardButton("✅ HAAN, AB BHEJ DI", callback_data="confirm")]
-            ]
-            await q.message.reply_text(
-                "✅ *Lagta hai sabhi requests bhej di hai*\n\n"
-                "Confirm karo 👇",
-                reply_markup=InlineKeyboardMarkup(keyboard),
-                parse_mode="Markdown"
-            )
-        else:
-            buttons = [
-                [InlineKeyboardButton("📢 Join Channel", url=link)]
-                for link in CHANNELS.values()
-            ]
-            buttons.append([InlineKeyboardButton("🔄 Dobara Check Status", callback_data="check")])
-
-            await q.message.reply_text(
-                "❌ *Abhi sabhi channels join nahi hue*\n\n"
-                "👉 Fir se request bhejo",
-                reply_markup=InlineKeyboardMarkup(buttons),
-                parse_mode="Markdown"
-            )
-
-    except:
+    if joined == len(CHANNELS):
+        keyboard = [[
+            InlineKeyboardButton("✅ HAAN, AB BHEJ DI", callback_data="confirm")
+        ]]
         await q.message.reply_text(
-            "⚠️ Error aa raha hai\n\n"
-            "👉 Fir se request bhejo aur dobara check karo"
+            "✅ *Sabhi channels confirmed*\n\n"
+            "Confirm karo 👇",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="Markdown"
+        )
+    else:
+        buttons = [
+            [InlineKeyboardButton("📢 Join Channel", url=link)]
+            for link in CHANNELS.values()
+        ]
+        buttons.append([InlineKeyboardButton("🔄 Dobara Check Status", callback_data="check")])
+
+        await q.message.reply_text(
+            "❌ *Abhi sabhi channels join nahi hue*\n\n"
+            "👉 Fir se request bhejo",
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode="Markdown"
         )
 
 # ============ CONFIRM ============
 async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
-    await q.answer("Sending video...")
+    await q.answer("Video bhej raha hoon...")
 
     await context.bot.send_video(
         chat_id=q.message.chat_id,
@@ -102,9 +98,9 @@ def main():
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(want, lambda q: q.data == "want"))
-    app.add_handler(CallbackQueryHandler(check, lambda q: q.data == "check"))
-    app.add_handler(CallbackQueryHandler(confirm, lambda q: q.data == "confirm"))
+    app.add_handler(CallbackQueryHandler(want, pattern="^want$"))
+    app.add_handler(CallbackQueryHandler(check, pattern="^check$"))
+    app.add_handler(CallbackQueryHandler(confirm, pattern="^confirm$"))
 
     print("Bot running...")
     app.run_polling()
