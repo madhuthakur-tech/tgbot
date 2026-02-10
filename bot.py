@@ -34,10 +34,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")
     ]]
     await update.message.reply_photo(
-        photo=START_PHOTO,
-        caption="😈 Kya tumhe meri *exclusive video* chahiye?",
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")
+    ]
+
+    await update.message.reply_text(
+        "😈 Kya tumhe meri exclusive video chahiye?",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+"
     )
 
 # ============== BUTTON CLICK ==============
