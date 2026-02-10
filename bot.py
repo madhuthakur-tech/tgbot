@@ -17,6 +17,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
 
+# channel_id : invite_link
 CHANNELS = {
     -1003708594569: "https://t.me/+xiDyyJTIWccxYzll",
     -1003797237946: "https://t.me/+K3jud7ThW4Q4NDQ1",
@@ -24,11 +25,16 @@ CHANNELS = {
     -1003737422554: "https://t.me/+_YmoMrDZ0oliMTll",
 }
 
-user_requests = {}   # user_id -> set(channel_ids)
-video_sent = set()
+# ================= MEMORY =================
+started_users = set()          # users who pressed /start
+user_requests = {}             # user_id -> set(channel_ids)
+video_sent = set()             # users who already got video
 
 # ================= START =================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    started_users.add(user_id)
+
     keyboard = [
         [InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want_video")]
     ]
@@ -63,29 +69,31 @@ async def join_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = req.from_user.id
     channel_id = req.chat.id
 
+    # sirf defined channels allow
     if channel_id not in CHANNELS:
         return
 
-    # approve request
-    await context.bot.approve_chat_join_request(channel_id, user_id)
+    # user ne /start nahi kiya → DM mat bhejo
+    if user_id not in started_users:
+        return
 
-    # track joined channels
+    # track request
     user_requests.setdefault(user_id, set()).add(channel_id)
 
-    # check if all channels joined
+    # all channels done?
     if user_requests[user_id] == set(CHANNELS.keys()):
         if user_id not in video_sent:
             await context.bot.send_video(
                 chat_id=user_id,
                 video=VIDEO_FILE_ID,
-                caption="✅ *Sabhi channels join ho gaye*\n\n🔥 Ye rahi tumhari exclusive video",
+                caption="✅ *Tumhari sabhi join requests complete ho gayi hain*\n\n🔥 Ye rahi tumhari exclusive video",
                 parse_mode="Markdown"
             )
             video_sent.add(user_id)
     else:
         await context.bot.send_message(
             chat_id=user_id,
-            text="⚠️ Abhi sabhi channels join nahi hue.\n\n👉 Saare channels join karo tabhi video milegi."
+            text="⏳ Abhi sabhi channels me join request nahi bheji.\n\n👉 Saare channels me request bhejo."
         )
 
 # ================= MAIN =================
@@ -101,5 +109,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
