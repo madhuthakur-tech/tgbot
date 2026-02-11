@@ -1,60 +1,74 @@
-import os
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    CallbackQueryHandler,
-    ContextTypes,
-)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# ====== ENV VARIABLES ======
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-VIDEO_ID = os.getenv("VIDEO_ID")
+import os
+
+TOKEN = os.getenv("BOT_TOKEN")
+
+
+VIDEO_FILE_ID = "BAACAgUAAxkBAAOzaYwpGyevVBtmm5eDkC65_Ek_luQAAn4mAAKqQWFULEPwzMO6CCI6BA"
+
+CHANNEL_LINKS = [
+    "https://t.me/+_YmoMrDZ0oliMTll",
+    "https://t.me/+-s8gGlM-BcY1NDll",
+    "https://t.me/+az-lgmrUAnU1MzQ1",
+    "https://t.me/+Ltw6NlDYtaQ5OWE1"
+]
 
 logging.basicConfig(level=logging.INFO)
 
 
-# /start command
+# START
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [
-        [InlineKeyboardButton("Join Channel ✅", callback_data="check")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    keyboard = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNEL_LINKS]
+
+    keyboard.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
 
     await update.message.reply_text(
-        "Button ko 2 baar click karo 😉",
-        reply_markup=reply_markup
+        "⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
 
-# Button handler (2nd click logic)
-async def check_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# FIRST CHECK (NO VIDEO)
+async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    user_id = query.from_user.id
+    keyboard = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNEL_LINKS]
 
-    # agar first time click
-    if context.user_data.get("clicked") is None:
-        context.user_data["clicked"] = 1
-        await query.message.reply_text("Ek baar aur click karo 👇")
-    else:
-        # second click pe video send
-        await query.message.reply_video(video=VIDEO_ID)
+    keyboard.append([InlineKeyboardButton("✅ Ab Bhej Di", callback_data="confirm")])
+
+    await query.message.reply_text(
+        "❌ Request confirm nahi hui.\n\n👉 Fir se request bhejo.\n\nBhej diya ho to niche button dabao.",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 
+# SECOND CONFIRM (SEND VIDEO)
+async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    await query.message.reply_video(
+        video=VIDEO_FILE_ID,
+        caption="🔥 Ye lo tumhara video 😎"
+    )
+
+
+# MAIN
 def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(check_click, pattern="check"))
+    app.add_handler(CallbackQueryHandler(check, pattern="check"))
+    app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
 
     print("Bot running...")
     app.run_polling()
 
 
-if __name__ == "__main__":
+if name == "main":
     main()
-
 
