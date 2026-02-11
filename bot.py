@@ -124,7 +124,7 @@ def main():
     app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
 
     PORT = int(os.environ.get("PORT", 8000))
-    RAILWAY_URL = os.environ.get("RAILWAY_STATIC_URL")
+    RAILWAY_URL = os.environ.get("https://worker-production-44acf.up.railway.app/")
 
     print("Bot running on webhook...")
 
