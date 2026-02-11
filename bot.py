@@ -65,7 +65,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_video(
         video=VIDEO_FILE_ID,
-        caption="🔥 Ye lo tumhara video 😎 \n  aur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
+        caption="🔥 Ye lo tumhara video 😎\nAur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
     )
 
 # ---------------- BROADCAST ----------------
@@ -78,9 +78,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sent = 0
 
-    # If replying to photo/video
     if update.message.reply_to_message:
-
         msg = update.message.reply_to_message
 
         for user in users:
@@ -91,20 +89,16 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         photo=msg.photo[-1].file_id,
                         caption=msg.caption
                     )
-
                 elif msg.video:
                     await context.bot.send_video(
                         chat_id=user[0],
                         video=msg.video.file_id,
                         caption=msg.caption
                     )
-
                 sent += 1
             except:
                 pass
-
     else:
-        # Text broadcast
         message = " ".join(context.args)
 
         if not message:
@@ -120,7 +114,7 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"✅ Broadcast sent to {sent} users")
 
-# ---------------- MAIN ----------------
+# ---------------- MAIN (WEBHOOK VERSION) ----------------
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -129,8 +123,17 @@ def main():
     app.add_handler(CallbackQueryHandler(check, pattern="check"))
     app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
 
-    print("Bot running...")
-    app.run_polling()
+    PORT = int(os.environ.get("PORT", 8000))
+    RAILWAY_URL = os.environ.get("RAILWAY_STATIC_URL")
+
+    print("Bot running on webhook...")
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"https://{RAILWAY_URL}/",
+    )
 
 if __name__ == "__main__":
     main()
+
