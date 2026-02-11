@@ -20,7 +20,7 @@ CHANNEL_LINKS = [
     "https://t.me/+Ltw6NlDYtaQ5OWE1"
 ]
 
-ADMIN_ID = 7307067431  # 🔴 Apni ID
+ADMIN_ID = 8566595573  # 🔴 Apni ID
 
 logging.basicConfig(level=logging.INFO)
 
