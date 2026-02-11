@@ -63,7 +63,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_video(
         video=VIDEO_FILE_ID,
-        caption="🔥 Ye lo tumhara video 😎"
+        caption="🔥 Ye lo tumhara video 😎 aur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
     )
 
 # ---------------- BROADCAST ----------------
