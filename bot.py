@@ -41,7 +41,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
 
     await update.message.reply_text(
-        "⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
+        "Kya tumhe meri exclusive video chahiye? 😘\n⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -65,7 +65,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_video(
         video=VIDEO_FILE_ID,
-        caption="🔥 Ye lo tumhara video 😎"
+        caption="🔥 Ye lo tumhara video 😎 \n  aur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
     )
 
 # ---------------- BROADCAST ----------------
