@@ -1,109 +1,70 @@
-import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+import logging
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# ============ CONFIG ============
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = "YOUR_BOT_TOKEN"
 
 VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
 
-CHANNELS = {
-    -1003708594569: "https://t.me/+_YmoMrDZ0oliMTll",
-    -1003797237946: "https://t.me/+-s8gGlM-BcY1NDll",
-    -1003585811000: "https://t.me/+az-lgmrUAnU1MzQ1",
-    -1003737422554: "https://t.me/+Ltw6NlDYtaQ5OWE1",
-}
+CHANNEL_LINKS = [
+    "https://t.me/+_YmoMrDZ0oliMTll",
+    "https://t.me/+-s8gGlM-BcY1NDll",
+    "https://t.me/+az-lgmrUAnU1MzQ1",
+    "https://t.me/+Ltw6NlDYtaQ5OWE1"
+]
 
-# ============ START ============
+logging.basicConfig(level=logging.INFO)
+
+
+# START
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[
-        InlineKeyboardButton("🔥 Mujhe Exclusive Video Chahiye", callback_data="want")
-    ]]
+    keyboard = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNEL_LINKS]
+
+    keyboard.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
+
     await update.message.reply_text(
-        "😈 *Exclusive video chahiye?*",
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        "⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ============ WANT ============
-async def want(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    q = update.callback_query
-    await q.answer()
 
-    buttons = [
-        [InlineKeyboardButton("📢 Join Channel", url=link)]
-        for link in CHANNELS.values()
-    ]
-    buttons.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
-
-    await q.message.reply_text(
-        "👇 *Sabhi channels me join request bhejo*\n\n"
-        "Phir **Check Status** dabao",
-        reply_markup=InlineKeyboardMarkup(buttons),
-        parse_mode="Markdown"
-    )
-
-# ============ CHECK STATUS ============
+# FIRST CHECK (NO VIDEO)
 async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    q = update.callback_query
-    await q.answer()
+    query = update.callback_query
+    await query.answer()
 
-    joined = 0
-    for cid in CHANNELS:
-        try:
-            m = await context.bot.get_chat_member(cid, q.from_user.id)
-            if m.status in ("member", "administrator", "creator"):
-                joined += 1
-        except:
-            pass
+    keyboard = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNEL_LINKS]
 
-    if joined == len(CHANNELS):
-        keyboard = [[
-            InlineKeyboardButton("✅ HAAN, AB BHEJ DI", callback_data="confirm")
-        ]]
-        await q.message.reply_text(
-            "✅ *Sabhi channels confirmed*\n\n"
-            "Confirm karo 👇",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-            parse_mode="Markdown"
-        )
-    else:
-        buttons = [
-            [InlineKeyboardButton("📢 Join Channel", url=link)]
-            for link in CHANNELS.values()
-        ]
-        buttons.append([InlineKeyboardButton("🔄 Dobara Check Status", callback_data="check")])
+    keyboard.append([InlineKeyboardButton("✅ Ab Bhej Di", callback_data="confirm")])
 
-        await q.message.reply_text(
-            "❌ *Abhi sabhi channels join nahi hue*\n\n"
-            "👉 Fir se request bhejo",
-            reply_markup=InlineKeyboardMarkup(buttons),
-            parse_mode="Markdown"
-        )
-
-# ============ CONFIRM ============
-async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    q = update.callback_query
-    await q.answer("Video bhej raha hoon...")
-
-    await context.bot.send_video(
-        chat_id=q.message.chat_id,
-        video=VIDEO_FILE_ID,
-        caption="🔥 *Ye rahi tumhari exclusive video*",
-        parse_mode="Markdown"
+    await query.message.reply_text(
+        "❌ Request confirm nahi hui.\n\n👉 Fir se request bhejo.\n\nBhej diya ho to niche button dabao.",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-# ============ MAIN ============
+
+# SECOND CONFIRM (SEND VIDEO)
+async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    await query.message.reply_video(
+        video=VIDEO_FILE_ID,
+        caption="🔥 Ye lo tumhara video 😎"
+    )
+
+
+# MAIN
 def main():
-    app = Application.builder().token(TOKEN).build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(want, pattern="^want$"))
-    app.add_handler(CallbackQueryHandler(check, pattern="^check$"))
-    app.add_handler(CallbackQueryHandler(confirm, pattern="^confirm$"))
+    app.add_handler(CallbackQueryHandler(check, pattern="check"))
+    app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
 
     print("Bot running...")
     app.run_polling()
+
 
 if __name__ == "__main__":
     main()
