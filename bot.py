@@ -39,7 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
 
     await update.message.reply_text(
-        "⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
+        "Kya tumhe meri exclusive video chahiye? 😘\n⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
