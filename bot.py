@@ -38,10 +38,10 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [[InlineKeyboardButton("📢 Join Channel", url=link)] for link in CHANNEL_LINKS]
 
-    keyboard.append([InlineKeyboardButton("✅ Ab Bhej Di", callback_data="confirm")])
+    keyboard.append([InlineKeyboardButton("✅ ha Bhej Di", callback_data="confirm")])
 
     await query.message.reply_text(
-        "❌ Request confirm nahi hui.\n\n👉 Fir se request bhejo.\n\nBhej diya ho to niche button dabao.",
+        "❌ Request confirm nahi hui.\n\n👉 Fir se request bhejo.\n\nBhej di.",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -53,7 +53,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_video(
         video=VIDEO_FILE_ID,
-        caption="🔥 Ye lo tumhara video 😎"
+        caption="🔥 Ye lo tumhara video 😎 aur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
     )
 
 
