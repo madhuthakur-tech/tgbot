@@ -2,7 +2,12 @@ import logging
 import os
 import sqlite3
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes,
+)
 
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -15,9 +20,7 @@ CHANNEL_LINKS = [
     "https://t.me/+Ltw6NlDYtaQ5OWE1"
 ]
 
-# 🔴 Yaha apna Telegram ID daalo
-ADMIN_ID = 7307067431
-
+ADMIN_ID = 7307067431  # 🔴 Apni ID
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,7 +34,6 @@ conn.commit()
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
 
-    # Save user
     cursor.execute("INSERT OR IGNORE INTO users (user_id) VALUES (?)", (user_id,))
     conn.commit()
 
@@ -39,7 +41,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard.append([InlineKeyboardButton("✅ Check Status", callback_data="check")])
 
     await update.message.reply_text(
-        "Kya tumhe meri exclusive video chahiye? 😘\n⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
+        "⚠️ Sabhi channels join karo.\n\nPhir 'Check Status' dabao.",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
@@ -63,7 +65,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await query.message.reply_video(
         video=VIDEO_FILE_ID,
-        caption="🔥 Ye lo tumhara video 😎 aur esi hi mast mast leak video buy krne ke liye dm kro @sexy_ladki_001"
+        caption="🔥 Ye lo tumhara video 😎"
     )
 
 # ---------------- BROADCAST ----------------
@@ -71,25 +73,52 @@ async def broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
 
-    message = " ".join(context.args)
-
-    if not message:
-        await update.message.reply_text("Usage:\n/broadcast your message")
-        return
-
     cursor.execute("SELECT user_id FROM users")
     users = cursor.fetchall()
 
     sent = 0
 
-    for user in users:
-        try:
-            await context.bot.send_message(chat_id=user[0], text=message)
-            sent += 1
-        except:
-            pass
+    # If replying to photo/video
+    if update.message.reply_to_message:
 
-    await update.message.reply_text(f"✅ Message sent to {sent} users")
+        msg = update.message.reply_to_message
+
+        for user in users:
+            try:
+                if msg.photo:
+                    await context.bot.send_photo(
+                        chat_id=user[0],
+                        photo=msg.photo[-1].file_id,
+                        caption=msg.caption
+                    )
+
+                elif msg.video:
+                    await context.bot.send_video(
+                        chat_id=user[0],
+                        video=msg.video.file_id,
+                        caption=msg.caption
+                    )
+
+                sent += 1
+            except:
+                pass
+
+    else:
+        # Text broadcast
+        message = " ".join(context.args)
+
+        if not message:
+            await update.message.reply_text("Reply to photo/video OR use:\n/broadcast your message")
+            return
+
+        for user in users:
+            try:
+                await context.bot.send_message(chat_id=user[0], text=message)
+                sent += 1
+            except:
+                pass
+
+    await update.message.reply_text(f"✅ Broadcast sent to {sent} users")
 
 # ---------------- MAIN ----------------
 def main():
