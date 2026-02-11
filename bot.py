@@ -123,17 +123,15 @@ def main():
     app.add_handler(CallbackQueryHandler(check, pattern="check"))
     app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
 
-    PORT = int(os.environ.get("PORT", 8000))
-    RAILWAY_URL = os.environ.get("https://worker-production-44acf.up.railway.app/")
+    PORT = int(os.environ.get("PORT", 8080))
+
+    WEBHOOK_URL = "https://worker-production-44acf.up.railway.app"
 
     print("Bot running on webhook...")
 
     app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        webhook_url=f"https://{RAILWAY_URL}/",
+        webhook_url=WEBHOOK_URL,
     )
-
-if __name__ == "__main__":
-    main()
-
+if __name__ == "__main__": main()
