@@ -1,8 +1,11 @@
-from telegram.ext import MessageHandler, filters
+from telegram import Update
+from telegram.ext import ContextTypes, MessageHandler, filters
 
 async def get_video_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    video = update.message.video
-    if video:
-        await update.message.reply_text(f"VIDEO FILE ID:\n{video.file_id}")
+    if update.message.video:
+        await update.message.reply_text(
+            f"VIDEO FILE ID:\n{update.message.video.file_id}"
+        )
 
 app.add_handler(MessageHandler(filters.VIDEO, get_video_id))
+
