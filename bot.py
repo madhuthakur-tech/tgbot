@@ -7,7 +7,7 @@ import os
 TOKEN = os.getenv("BOT_TOKEN")
 
 
-VIDEO_FILE_ID = "BAACAgUAAxkBAAMGaYsBMV20nnbb4rsaPbLn1MRIHCsAApcrAALyjiBVj1XTQUYPxK86BA"
+VIDEO_FILE_ID = "BAACAgUAAxkBAAMMaYtiqwmh6GSK74jKRh33PWICJeEAAjsZAAKDQ3hV3jlgbfXlUgs6B"
 
 CHANNEL_LINKS = [
     "https://t.me/+_YmoMrDZ0oliMTll",
