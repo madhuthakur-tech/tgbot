@@ -1,28 +1,60 @@
 import os
-from telegram import Update
-from telegram.ext import Application, MessageHandler, ContextTypes, filters
+import logging
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    CallbackQueryHandler,
+    ContextTypes,
+)
 
-TOKEN = os.getenv("BOT_TOKEN")  # Railway/Render me env variable me token daalo
+# ====== ENV VARIABLES ======
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+VIDEO_ID = os.getenv("VIDEO_ID")
 
-async def get_video_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    video = update.message.video
+logging.basicConfig(level=logging.INFO)
 
-    file_id = video.file_id
-    file_unique_id = video.file_unique_id
+
+# /start command
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("Join Channel ✅", callback_data="check")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        f"🎥 Video File ID:\n\n{file_id}\n\n"
-        f"🔹 Unique ID:\n{file_unique_id}"
+        "Button ko 2 baar click karo 😉",
+        reply_markup=reply_markup
     )
 
-def main():
-    app = Application.builder().token(TOKEN).build()
 
-    app.add_handler(MessageHandler(filters.VIDEO, get_video_id))
+# Button handler (2nd click logic)
+async def check_click(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    user_id = query.from_user.id
+
+    # agar first time click
+    if context.user_data.get("clicked") is None:
+        context.user_data["clicked"] = 1
+        await query.message.reply_text("Ek baar aur click karo 👇")
+    else:
+        # second click pe video send
+        await query.message.reply_video(video=VIDEO_ID)
+
+
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(check_click, pattern="check"))
 
     print("Bot running...")
     app.run_polling()
 
+
 if __name__ == "__main__":
     main()
+
 
